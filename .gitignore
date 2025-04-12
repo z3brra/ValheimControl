@@ -1,0 +1,8 @@
+node_modules/
+vendor/
+var/
+.env
+.env.local
+dist/
+
+user.txt
