@@ -1,0 +1,28 @@
+FROM php:8.2-fpm
+
+RUN apt-get update && apt-get install -y \
+    libpq-dev \
+    git \
+    unzip \
+    libzip-dev \
+    && docker-php-ext-install pdo_mysql zip
+
+RUN pecl install mongodb \
+    && docker-php-ext-enable mongodb
+
+
+# Installation de Composer depuis l'image officielle
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+WORKDIR /var/www/api
+
+# Copier le code de l'API depuis le dossier backend_arcadia
+COPY backend_valheim_control/ ./
+
+RUN if [ ! -f ".env" ]; then \
+      if [ -f ".env.dist" ]; then cp .env.dist .env; \
+      else echo "APP_ENV=prod\nAPP_SECRET=changeme" > .env; \
+      fi; \
+    fi
+
+RUN composer install --no-dev --optimize-autoloader
