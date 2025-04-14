@@ -1,0 +1,51 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    name: Build Docker Images Locally
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Build API image locally
+        run: |
+          docker build -t valheimcontrol_backend:latest -f docker/Dockerfile.back .
+
+      - name: Build Front image locally
+        run: |
+          docker build -t valheimcontrol_front:latest -f docker/Dockerfile.front .
+
+  deploy:
+    name: Deploy to VPS
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.2.2
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: 2222
+          script: |
+            # Se positionner dans le répertoire du projet sur le VPS et mettre à jour le code
+            cd /home/valheim/ValheimControl
+            git pull
+            cd docker
+            # Recréer les containers à partir du docker-compose local
+            docker-compose down
+            docker-compose -p valheimcontrol up -d --build
+            docker system prune -f
