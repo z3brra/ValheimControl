@@ -46,6 +46,6 @@ jobs:
             git pull
             cd docker
             # Recréer les containers à partir du docker-compose local
-            docker-compose down
+            docker-compose -p valheimcontrol down
             docker-compose -p valheimcontrol up -d --build
             docker system prune -f
