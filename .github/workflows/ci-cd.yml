@@ -47,6 +47,6 @@ jobs:
             cd docker
             # Recréer les containers à partir du docker-compose local
             docker-compose -p valheimcontrol down
-            docker-compose -p zooarcadia.eu build --no-cache
-            docker-compose -p zooarcadia up -d
+            docker-compose -p valheimcontrol build --no-cache
+            docker-compose -p valheimcontrol up -d
             docker system prune -f
