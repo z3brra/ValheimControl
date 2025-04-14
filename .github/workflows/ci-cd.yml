@@ -47,5 +47,5 @@ jobs:
             cd docker
             # Recréer les containers à partir du docker-compose local
             docker-compose -p valheimcontrol down
-            docker-compose -p valheimcontrol up -d --build
+            docker-compose -p valheimcontrol up -d --build --no-cache
             docker system prune -f
